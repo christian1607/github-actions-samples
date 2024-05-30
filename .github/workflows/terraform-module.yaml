@@ -2,7 +2,7 @@ name: Terraform Module Pipeline
 run-name: "Terraform Module Pipeline"
 env:
   TF_VERSION: '1.5.4'
-  GO_VERSION: '1.23.0'
+  GO_VERSION: '1.21'
 on:
   workflow_dispatch:
   push:
