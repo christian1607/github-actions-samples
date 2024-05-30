@@ -101,3 +101,17 @@ jobs:
       uses: gittools/actions/gitversion/setup@v1.1.1
       with:
         versionSpec: '5.x'  
+
+    - name: Determine Version
+      id: version_step # step id used as reference for output values
+      uses: gittools/actions/gitversion/execute@v1.1.1
+
+    - name: Create Tag
+      working-directory: terraform/modules/vpc
+      run: | 
+        git config user.email "noreply@example.com"
+        git config user.name "Github Actions"
+        git tag -a "${{ steps.version_step.outputs.fullSemVer }}" -m "Publish tag"
+        git push origin "${{ steps.version_step.outputs.fullSemVer }}" -q
+
+      
