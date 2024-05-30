@@ -1,0 +1,64 @@
+name: Terraform Module Pipeline
+run-name: "Terraform Module Pipeline"
+env:
+  TF_VERSION: '1.5.4'
+  GO_VERSION: '1.20.3'
+on:
+  workflow_dispatch:
+  push:
+    branches:
+    - main
+    paths: 
+    - terraform/modules/**
+  pull_request: 
+    branches:
+    - main
+    paths:
+    - terraform/modules/**
+jobs:
+
+  check_module:
+    name: "Security Scan"
+    environment: dev
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: Run Checkov action
+      id: checkov
+      uses: bridgecrewio/checkov-action@master
+      with:
+        directory: terraform/modules/vpc/
+        soft_fail: false
+        download_external_modules: true
+        
+  test_module:
+    needs: check_module
+    name: "Test Module"
+    environment: dev
+    runs-on: ubuntu-latest
+    env:
+      ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+      AZURE_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+      AZURE_TENANT_ID: ${{ secrets.ARM_TENANT_ID }} 
+      AZURE_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: actions/setup-go@v4
+      name: Install Golang
+      with:
+        go-version: ${{ env.GO_VERSION }}
+
+    - uses: hashicorp/setup-terraform@v2
+      name: Setup Terraform
+      with:
+        terraform_version: ${{ env.TF_VERSION }}
+#        cli_config_credentials_token: ${{ secrets.TF_CLOUD_TOKEN }}
+        terraform_wrapper: false # this change is mandatory in order to work with terratest
+        
+    - name: Test Module
+      working-directory: terraform/modules/vpc/test
+      run: go test -v 
