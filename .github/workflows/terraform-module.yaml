@@ -74,7 +74,7 @@ jobs:
 
   update_documentation:
     needs: test_module
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && always()
     name: "Update Documentation"
     environment: dev
     runs-on: ubuntu-latest
@@ -91,7 +91,7 @@ jobs:
   
   release_version:
     needs: update_documentation
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && always()
     name: "Release new version"
     environment: dev
     runs-on: ubuntu-latest
