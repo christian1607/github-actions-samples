@@ -111,7 +111,7 @@ jobs:
       run: | 
         git config user.email "noreply@example.com"
         git config user.name "Github Actions"
-        git tag -a "${{ steps.version_step.outputs.fullSemVer }}" -m "Publish tag"
-        git push origin "${{ steps.version_step.outputs.fullSemVer }}" -q
+        git tag -a "${{ steps.version_step.outputs.semVer }}" -m "Publish tag"
+        git push origin "${{ steps.version_step.outputs.semVer }}" -q
 
       
