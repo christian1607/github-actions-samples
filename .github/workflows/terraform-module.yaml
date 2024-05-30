@@ -69,3 +69,19 @@ jobs:
     - name: Test Module
       working-directory: terraform/modules/vpc/test
       run: go test -v 
+      
+  update_documentation:
+    needs: test_module
+    name: "Update Documentation"
+    environment: dev
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Render terraform docs and push changes back to PR
+      uses: terraform-docs/gh-actions@main
+      with:
+        working-dir: terraform/modules/vpc
+        output-file: README.md
+        output-method: inject
+        git-push: "true"
