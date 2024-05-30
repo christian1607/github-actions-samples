@@ -6,7 +6,7 @@ resource "aws_vpc" "vpc" {
     tags = {
       Name = "${var.codigo_app}-vpc"
       Project = "htfc"
-      Env = "desa"
+      Env = "test"
     }
 }
 
